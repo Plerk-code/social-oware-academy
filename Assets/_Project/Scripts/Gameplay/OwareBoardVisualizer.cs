@@ -287,7 +287,7 @@ public class PitClickHandler : MonoBehaviour
     void OnMouseDown()
     {
         // Find visualizer and notify of click
-        OwareBoardVisualizer visualizer = FindObjectOfType<OwareBoardVisualizer>();
+        OwareBoardVisualizer visualizer = FindFirstObjectByType<OwareBoardVisualizer>();
         if (visualizer != null)
         {
             visualizer.OnPitClicked(pitIndex);
