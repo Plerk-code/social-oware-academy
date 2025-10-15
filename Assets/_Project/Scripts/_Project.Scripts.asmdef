@@ -11,7 +11,8 @@
         "Unity.Services.Leaderboards",
         "Unity.Services.Multiplayer",
         "Unity.Networking.Transport",
-        "Unity.Multiplayer.Tools.NetworkProfiler.Runtime"
+        "Unity.Multiplayer.Tools.NetworkProfiler.Runtime",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
