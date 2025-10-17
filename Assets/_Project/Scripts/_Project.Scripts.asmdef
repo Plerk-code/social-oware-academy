@@ -12,7 +12,8 @@
         "Unity.Services.Multiplayer",
         "Unity.Networking.Transport",
         "Unity.Multiplayer.Tools.NetworkProfiler.Runtime",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,4 +1,7 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.EventSystems;
 using TMPro;
 using SocialOwareAcademy.Gameplay;
 
@@ -27,7 +30,10 @@ public class OwareBoardVisualizer : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("[Visualizer] Start() called - creating board visualization");
+        Debug.Log($"[Visualizer] Player1Color: {player1Color}, Player2Color: {player2Color}");
         CreateBoardVisualization();
+        Debug.Log("[Visualizer] Board visualization created");
 
         // Subscribe to GameManager events
         if (GameManager.Instance != null)
@@ -35,6 +41,11 @@ public class OwareBoardVisualizer : MonoBehaviour
             GameManager.Instance.OnGameStarted += OnGameStarted;
             GameManager.Instance.OnMoveMade += OnMoveMade;
             GameManager.Instance.OnGameEnded += OnGameEnded;
+            Debug.Log("[Visualizer] Subscribed to GameManager events");
+        }
+        else
+        {
+            Debug.LogError("[Visualizer] GameManager.Instance is NULL!");
         }
 
         UpdateInstructions();
@@ -67,6 +78,19 @@ public class OwareBoardVisualizer : MonoBehaviour
         // Center camera
         Camera.main.transform.position = new Vector3(pitSpacing * 2.5f, 10f, pitSpacing);
         Camera.main.transform.LookAt(new Vector3(pitSpacing * 2.5f, 0, pitSpacing));
+
+        // Add Physics Raycaster to camera if not present (needed for OnMouseDown to work)
+        if (Camera.main.GetComponent<PhysicsRaycaster>() == null)
+        {
+            Camera.main.gameObject.AddComponent<PhysicsRaycaster>();
+            Debug.Log("[Visualizer] Added PhysicsRaycaster to Main Camera");
+        }
+        else
+        {
+            Debug.Log("[Visualizer] PhysicsRaycaster already exists on Main Camera");
+        }
+
+        Debug.Log($"[Visualizer] Camera position: {Camera.main.transform.position}, rotation: {Camera.main.transform.rotation.eulerAngles}");
     }
 
     /// <summary>
@@ -80,19 +104,36 @@ public class OwareBoardVisualizer : MonoBehaviour
         pitObj.transform.position = position;
         pitObj.transform.localScale = new Vector3(pitSize, 0.5f, pitSize);
 
-        // Add collider for clicking
-        pitObj.AddComponent<BoxCollider>();
+        // CreatePrimitive already adds a BoxCollider, so we don't need to add another
+        BoxCollider collider = pitObj.GetComponent<BoxCollider>();
+        Debug.Log($"[Visualizer] Created pit {pitIndex} at {position}, collider: {collider != null}");
 
         // Store pit index in a component for click detection
         PitClickHandler clickHandler = pitObj.AddComponent<PitClickHandler>();
         clickHandler.pitIndex = pitIndex;
+        Debug.Log($"[Visualizer] Added PitClickHandler to pit {pitIndex}");
 
         // Set color
         Renderer renderer = pitObj.GetComponent<Renderer>();
-        Material mat = new Material(Shader.Find("Standard"));
+        // Use Unlit shader so lighting doesn't affect the color
+        Shader shader = Shader.Find("Unlit/Color");
+        if (shader == null)
+        {
+            // Fallback to Universal Render Pipeline unlit
+            shader = Shader.Find("Universal Render Pipeline/Unlit");
+        }
+        if (shader == null)
+        {
+            // Final fallback to Standard
+            shader = Shader.Find("Standard");
+        }
+
+        Material mat = new Material(shader);
         mat.color = color;
         renderer.material = mat;
         pitMaterials[pitIndex] = mat;
+
+        Debug.Log($"[Visualizer] Pit {pitIndex} ({playerName}) color set to: {color}, shader: {shader.name}");
 
         // Create text for seed count
         GameObject textObj = new GameObject($"SeedCount_{pitIndex}");
@@ -255,13 +296,49 @@ public class OwareBoardVisualizer : MonoBehaviour
 
     void Update()
     {
+        // Handle mouse clicks for pit selection
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            HandleMouseClick();
+        }
+
         // Press SPACE to restart
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.StartNewGame();
             }
+        }
+    }
+
+    /// <summary>
+    /// Handle mouse click using raycast.
+    /// </summary>
+    private void HandleMouseClick()
+    {
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+
+        Debug.Log($"[Visualizer] Mouse clicked at screen pos: {mousePosition}");
+
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            Debug.Log($"[Visualizer] Raycast hit: {hit.collider.gameObject.name}");
+
+            PitClickHandler clickHandler = hit.collider.GetComponent<PitClickHandler>();
+            if (clickHandler != null)
+            {
+                OnPitClicked(clickHandler.pitIndex);
+            }
+            else
+            {
+                Debug.Log($"[Visualizer] Hit object has no PitClickHandler");
+            }
+        }
+        else
+        {
+            Debug.Log($"[Visualizer] Raycast hit nothing");
         }
     }
 
@@ -286,11 +363,17 @@ public class PitClickHandler : MonoBehaviour
 
     void OnMouseDown()
     {
+        Debug.Log($"[PitClickHandler] Pit {pitIndex} clicked!");
+
         // Find visualizer and notify of click
         OwareBoardVisualizer visualizer = FindFirstObjectByType<OwareBoardVisualizer>();
         if (visualizer != null)
         {
             visualizer.OnPitClicked(pitIndex);
+        }
+        else
+        {
+            Debug.LogWarning("[PitClickHandler] Could not find OwareBoardVisualizer!");
         }
     }
 }
