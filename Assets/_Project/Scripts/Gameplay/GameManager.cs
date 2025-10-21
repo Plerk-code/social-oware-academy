@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using SocialOwareAcademy.Gameplay;
+using SocialOwareAcademy.Gameplay.AI;
 
 /// <summary>
 /// Central game manager - Singleton that orchestrates Oware matches.
@@ -16,9 +17,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private bool isAIOpponent = true;
     [SerializeField] private int humanPlayerIndex = 0; // 0 or 1
 
+    [Header("AI Settings")]
+    [SerializeField] private AIDifficulty aiDifficulty = AIDifficulty.Beginner;
+
     // Core game state
     private OwareBoard board;
     private bool isGameActive = false;
+    private IOwareAI aiOpponent;
 
     // Events
     public event Action<OwareBoard> OnGameStarted;
@@ -60,6 +65,13 @@ public class GameManager : MonoBehaviour
 
         // Create new board
         board = new OwareBoard();
+
+        // Initialize AI opponent if playing against AI
+        if (isAIOpponent)
+        {
+            aiOpponent = CreateAI(aiDifficulty);
+            Debug.Log($"[GameManager] AI opponent initialized: {aiOpponent.GetDifficultyName()}");
+        }
 
         // Subscribe to board events
         board.OnGameOver += HandleGameOver;
@@ -134,14 +146,25 @@ public class GameManager : MonoBehaviour
         if (!isGameActive || IsHumanTurn)
             return;
 
+        if (aiOpponent == null)
+        {
+            Debug.LogError("[GameManager] AI opponent not initialized!");
+            return;
+        }
+
         Debug.Log("[GameManager] AI is thinking...");
 
-        // Simple AI: Pick first valid move (for now - will improve later)
-        var validMoves = OwareRules.GetValidMoves(board);
+        // Measure AI performance
+        var startTime = System.Diagnostics.Stopwatch.StartNew();
+        
+        // Get AI move
+        int aiMove = aiOpponent.GetMove(board);
+        
+        startTime.Stop();
+        Debug.Log($"[GameManager] AI decision time: {startTime.ElapsedMilliseconds}ms");
 
-        if (validMoves.Count > 0)
+        if (aiMove != -1)
         {
-            int aiMove = validMoves[UnityEngine.Random.Range(0, validMoves.Count)];
             Debug.Log($"[GameManager] AI chooses pit {aiMove}");
 
             OwareRules.ExecuteMove(board, aiMove);
@@ -160,6 +183,50 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("[GameManager] AI has no valid moves");
             EndGame();
         }
+    }
+
+    /// <summary>
+    /// Create an AI opponent based on difficulty level.
+    /// </summary>
+    private IOwareAI CreateAI(AIDifficulty difficulty)
+    {
+        switch (difficulty)
+        {
+            case AIDifficulty.Beginner:
+                return new BeginnerAI();
+            // Future AI levels:
+            // case AIDifficulty.Intermediate:
+            //     return new IntermediateAI();
+            // case AIDifficulty.Advanced:
+            //     return new AdvancedAI();
+            default:
+                Debug.LogWarning($"[GameManager] Unknown AI difficulty: {difficulty}, defaulting to Beginner");
+                return new BeginnerAI();
+        }
+    }
+
+    /// <summary>
+    /// Set AI difficulty level (for UI integration).
+    /// </summary>
+    public void SetAIDifficulty(AIDifficulty difficulty)
+    {
+        aiDifficulty = difficulty;
+        Debug.Log($"[GameManager] AI difficulty set to: {difficulty}");
+        
+        // If game is active, reinitialize AI
+        if (isGameActive && isAIOpponent)
+        {
+            aiOpponent = CreateAI(aiDifficulty);
+            Debug.Log($"[GameManager] AI opponent reinitialized: {aiOpponent.GetDifficultyName()}");
+        }
+    }
+
+    /// <summary>
+    /// Get current AI difficulty level.
+    /// </summary>
+    public AIDifficulty GetAIDifficulty()
+    {
+        return aiDifficulty;
     }
 
     /// <summary>
