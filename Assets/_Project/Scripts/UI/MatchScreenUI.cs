@@ -328,10 +328,10 @@ namespace SocialOwareAcademy.UI
         private void OnMainMenuClicked()
         {
             Debug.Log("[MatchScreenUI] Main Menu clicked");
-            // TODO: Navigate to main menu using UIManager
+            // Navigate to main menu using UIManager
             if (UIManager.Instance != null)
             {
-                UIManager.Instance.GoToScreen(Screen.MainMenu);
+                UIManager.Instance.ShowScreen(Screen.MainMenu);
             }
         }
 
