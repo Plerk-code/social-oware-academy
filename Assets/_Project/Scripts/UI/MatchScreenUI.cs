@@ -310,7 +310,7 @@ namespace SocialOwareAcademy.UI
 
             gameOverAnim?.Kill();
             gameOverAnim = DOTween.Sequence()
-                .Append(canvasGroup.DOFade(1f, LayoutConstants.ANIM_MEDIUM))
+                .Append(DOTween.To(() => canvasGroup.alpha, x => canvasGroup.alpha = x, 1f, LayoutConstants.ANIM_MEDIUM))
                 .Join(gameOverPanel.transform.DOScale(Vector3.one, LayoutConstants.ANIM_MEDIUM)
                     .SetEase(Ease.OutBack));
         }
