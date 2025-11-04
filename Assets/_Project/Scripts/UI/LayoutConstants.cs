@@ -61,7 +61,7 @@ namespace SocialOwareAcademy.UI
         /// </summary>
         public static float ScreenRelativeSize(float size)
         {
-            float heightRatio = Screen.height / REFERENCE_RES.y;
+            float heightRatio = UnityEngine.Screen.height / REFERENCE_RES.y;
             return size * heightRatio;
         }
 
@@ -70,7 +70,7 @@ namespace SocialOwareAcademy.UI
         /// </summary>
         public static Rect GetSafeArea()
         {
-            return Screen.safeArea;
+            return UnityEngine.Screen.safeArea;
         }
     }
 }
