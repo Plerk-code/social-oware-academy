@@ -20,7 +20,7 @@ namespace SocialOwareAcademy.UI
 
         [Header("Audio")]
         [SerializeField] private bool playSound = true;
-        [SerializeField] private string soundName = "button_press";
+        [SerializeField] private AudioClip buttonPressSound;
 
         [Header("Haptics")]
         [SerializeField] private bool useHaptics = true;
@@ -60,9 +60,9 @@ namespace SocialOwareAcademy.UI
         public void OnPointerClick(PointerEventData eventData)
         {
             // Play sound
-            if (playSound && AudioManager.Instance != null)
+            if (playSound && buttonPressSound != null && AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlaySFX(soundName);
+                AudioManager.Instance.PlaySFX(buttonPressSound);
             }
 
             // Haptic feedback
@@ -92,9 +92,9 @@ namespace SocialOwareAcademy.UI
                 .Append(rectTransform.DOScale(originalScale * pressScale, pressDuration).SetEase(pressEase))
                 .Append(rectTransform.DOScale(originalScale, pressDuration).SetEase(releaseEase));
 
-            if (playSound && AudioManager.Instance != null)
+            if (playSound && buttonPressSound != null && AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlaySFX(soundName);
+                AudioManager.Instance.PlaySFX(buttonPressSound);
             }
 
             if (useHaptics)

@@ -27,6 +27,8 @@ namespace SocialOwareAcademy.UI
 
         [Header("Audio")]
         [SerializeField] private bool playSound = true;
+        [SerializeField] private AudioClip seedDropSound;
+        [SerializeField] private AudioClip captureSound;
 
         // Object pool for seeds
         private ObjectPool<GameObject> seedPool;
@@ -95,7 +97,7 @@ namespace SocialOwareAcademy.UI
                     .OnComplete(() =>
                     {
                         // Play landing sound
-                        PlaySeedSound("seed_drop");
+                        PlaySeedSound(seedDropSound);
 
                         // Return seed to pool
                         seedPool.Release(seed);
@@ -137,7 +139,7 @@ namespace SocialOwareAcademy.UI
                             if (i == seedCount - 1)
                             {
                                 PlayCaptureEffect(toPosition);
-                                PlaySeedSound("capture");
+                                PlaySeedSound(captureSound);
                             }
 
                             // Return to pool
@@ -176,11 +178,11 @@ namespace SocialOwareAcademy.UI
         /// <summary>
         /// Play seed-related sound effect
         /// </summary>
-        private void PlaySeedSound(string soundName)
+        private void PlaySeedSound(AudioClip clip)
         {
-            if (playSound && AudioManager.Instance != null)
+            if (playSound && clip != null && AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlaySFX(soundName);
+                AudioManager.Instance.PlaySFX(clip);
             }
         }
 
