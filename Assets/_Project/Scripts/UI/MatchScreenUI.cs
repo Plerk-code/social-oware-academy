@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
 using SocialOwareAcademy.Gameplay;
+using SocialOwareAcademy.Managers;
 
 namespace SocialOwareAcademy.UI
 {
@@ -330,7 +331,7 @@ namespace SocialOwareAcademy.UI
             // TODO: Navigate to main menu using UIManager
             if (UIManager.Instance != null)
             {
-                UIManager.Instance.GoToScreen(UIManager.ScreenType.MainMenu);
+                UIManager.Instance.GoToScreen(Screen.MainMenu);
             }
         }
 

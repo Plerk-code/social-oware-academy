@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
+using SocialOwareAcademy.Managers;
 
 namespace SocialOwareAcademy.UI
 {

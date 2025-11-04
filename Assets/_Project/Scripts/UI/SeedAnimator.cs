@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Pool;
 using DG.Tweening;
 using System;
+using SocialOwareAcademy.Managers;
 
 namespace SocialOwareAcademy.UI
 {
