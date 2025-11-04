@@ -235,7 +235,7 @@ namespace SocialOwareAcademy.UI
                     ? colorPalette.WithAlpha(colorPalette.terracotta, 0.3f)
                     : colorPalette.WithAlpha(colorPalette.deepBrown, 0.6f);
 
-                player1Panel.DOColor(targetColor, LayoutConstants.ANIM_MEDIUM);
+                DOTween.To(() => player1Panel.color, x => player1Panel.color = x, targetColor, LayoutConstants.ANIM_MEDIUM);
             }
 
             // Animate player 2 panel
@@ -245,7 +245,7 @@ namespace SocialOwareAcademy.UI
                     ? colorPalette.WithAlpha(colorPalette.danger, 0.3f)
                     : colorPalette.WithAlpha(colorPalette.deepBrown, 0.6f);
 
-                player2Panel.DOColor(targetColor, LayoutConstants.ANIM_MEDIUM);
+                DOTween.To(() => player2Panel.color, x => player2Panel.color = x, targetColor, LayoutConstants.ANIM_MEDIUM);
             }
         }
 
