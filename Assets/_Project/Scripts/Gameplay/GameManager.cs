@@ -194,9 +194,9 @@ public class GameManager : MonoBehaviour
         {
             case AIDifficulty.Beginner:
                 return new BeginnerAI();
+            case AIDifficulty.Intermediate:
+                return new IntermediateAI();
             // Future AI levels:
-            // case AIDifficulty.Intermediate:
-            //     return new IntermediateAI();
             // case AIDifficulty.Advanced:
             //     return new AdvancedAI();
             default:

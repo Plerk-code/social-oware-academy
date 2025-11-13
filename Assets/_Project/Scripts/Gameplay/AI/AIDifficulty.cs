@@ -6,7 +6,7 @@ namespace SocialOwareAcademy.Gameplay.AI
     public enum AIDifficulty
     {
         Beginner = 0,
-        // Intermediate = 1,  // Future: Minimax depth 3
+        Intermediate = 1,  // Minimax depth 3
         // Advanced = 2,       // Future: Alpha-beta pruning
     }
 }
